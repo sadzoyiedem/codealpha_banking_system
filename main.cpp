@@ -25,6 +25,9 @@ int main()
        << "Welcome to Version 1 of the Edem's Banking System Application" << endl;
   divider();
 
+  // Data structure holding list of customers 
+  vector<Customer> bank_database;
+
   bool running = false;
   do
   {
@@ -38,7 +41,10 @@ int main()
     switch (user_option)
     {
     case 1:
-      account_creation();
+      account_creation(bank_database);
+#if DEBUG
+      bank_database[0].display_details(); // This will now show "Accounts Owned: 1"
+#endif
       break;
     case 2:
       break;

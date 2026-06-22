@@ -1,6 +1,7 @@
 #include <iomanip>
 #include "main.h"
 #include "functions.h"
+#include <random>
 
 // Helper functions
 
@@ -46,9 +47,34 @@ bool input_validation(int min, int max, int &user_opt)
   return false;
 }
 
-// Program functionalities
+string generate_account_number()
+{
+  random_device rd;
 
-void account_creation()
+  mt19937_64 engine(rd());
+
+  uniform_int_distribution<long long> rules(1000000000LL, 9999999999LL);
+
+  long long raw_number = rules(engine);
+
+  return to_string(raw_number);
+}
+
+bool validate_trans_amount(float amount)
+{
+  if (cin.fail() || amount < 0)
+  {
+    cin.clear();
+    cin.ignore(1000, '\n');
+    cout << "Invalid amount entered!\nRe-enter amount: ";
+    return true;
+  }
+
+  return false;
+}
+
+// Program functionalities
+void account_creation(vector<Customer> &database)
 {
   clear_screen();
   divider();
@@ -69,7 +95,29 @@ void account_creation()
   // Instantiating customer object
   Customer n_customer(user_first_name, user_last_name, user_email);
 
+  // Prompting for initial deposit
+  float ini_depo{};
+  cout << "Enter startup amount: ";
+  cin >> ini_depo;
+  while (validate_trans_amount(ini_depo))
+  {
+    cin >> ini_depo;
+  }
+
+  // Instantiating linked account-customer object
+  Account n_account(ini_depo);
+  n_customer.add_account(n_account); // linking objects
+
+  database.push_back(n_customer);
+
 #if DEBUG
-  n_customer.display_details();
+  n_customer.display_details(); // This will now show "Accounts Owned: 1"
 #endif
+
+  // Displaying success message
+  divider();
+  cout << "Account created successfully."<< endl;
+  n_customer.display_accounts();  
+  divider();
+
 }
