@@ -25,7 +25,7 @@ int main()
        << "Welcome to Version 1 of the Edem's Banking System Application" << endl;
   divider();
 
-  // Data structure holding list of customers 
+  // Data structure holding list of customers
   vector<Customer> bank_database;
 
   bool running = false;
@@ -59,4 +59,92 @@ int main()
   } while (running);
 
   return 0;
+}
+
+// Functions definitions from main.h
+
+void Account::withdraw(float amount)
+{
+  if (amount > balance)
+  {
+    cout << "Insufficient account balance to perform transaction!\nTop up acccount balance." << endl;
+    return;
+  }
+
+  balance -= amount;
+  cout << "Withdrawal successful." << endl;
+}
+
+void Account::display_transactions()
+{
+  cout << "Transactions summary for " << account_number << endl;
+
+  if (transactions.empty())
+  {
+    cout << "No transactions recorded yet." << endl;
+    return;
+  }
+
+  for (int i = 0; i < transactions.size(); i++)
+  {
+    cout << "Transaction " << i + 1
+         << "Transaction id: " << transactions[i].get_trans_id()
+         << "Amount: " << transactions[i].get_amount() << endl;
+  }
+
+  divider();
+}
+void AuthManager::register_user(string username, string password)
+{
+  if (!is_valid_username(username))
+    return;
+
+  if (!is_valid_password(password))
+    return;
+
+  if (username_exists(username))
+  {
+    cout << "Registration failed: username '" << username << "' is already taken.\n";
+    return;
+  }
+
+  string hashed_password = hash_password(password);
+
+  ofstream file(data_file, ios::app);
+  if (!file)
+  {
+    cout << "Registration failed: could not open the data file.\n";
+    return;
+  }
+
+  file << username << " " << hashed_password << endl;
+  cout << "Registration successful! You can now log in as '" << username << "'.\n";
+}
+
+void AuthManager::login_user(string username, string password)
+{
+  ifstream file(data_file);
+  if (!file)
+  {
+    cout << "Login failed: no users have registered yet.\n";
+    return;
+  }
+
+  string file_username, file_hash;
+  string entered_hash = hash_password(password);
+
+  while (file >> file_username >> file_hash)
+  {
+    if (file_username == username)
+    {
+      if (file_hash == entered_hash)
+        cout << "Login successful! Welcome back, " << username << ".\n";
+      else
+        cout << "Login failed: incorrect password.\n";
+
+      return;
+    }
+  }
+  
+  cout << "Login failed: username '" << username << "' not found.\n";
 }

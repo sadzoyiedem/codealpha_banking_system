@@ -47,19 +47,6 @@ bool input_validation(int min, int max, int &user_opt)
   return false;
 }
 
-string generate_account_number()
-{
-  random_device rd;
-
-  mt19937_64 engine(rd());
-
-  uniform_int_distribution<long long> rules(1000000000LL, 9999999999LL);
-
-  long long raw_number = rules(engine);
-
-  return to_string(raw_number);
-}
-
 bool validate_trans_amount(float amount)
 {
   if (cin.fail() || amount < 0)

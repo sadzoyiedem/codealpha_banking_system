@@ -10,7 +10,6 @@ void welcome_menu();
 void divider();
 void clear_screen();
 bool input_validation(int min, int max, int &user_opt);
-string generate_account_number();
 bool validate_trans_amount(float amount);
 
 // Program Functionalities
