@@ -1,7 +1,6 @@
 #include <iomanip>
 #include "main.h"
 #include "functions.h"
-#include <random>
 
 // Helper functions
 
@@ -61,26 +60,33 @@ bool validate_trans_amount(float amount)
 }
 
 // Program functionalities
-void account_creation(vector<Customer> &database)
+void account_creation(vector<Customer> &database, AuthManager &auth)
 {
   clear_screen();
   divider();
   cout << setw(45) << "ACCOUNT CREATION" << endl;
   divider();
 
-  string user_first_name;
-  string user_last_name;
-  string user_email;
+  string username, password;
 
-  cout << "Enter you first name: ";
-  cin >> user_first_name;
-  cout << "Enter you last name: ";
-  cin >> user_last_name;
-  cout << "Enter you email: ";
-  cin >> user_email;
+  cout << "Enter your username: ";
+  cin >> username;
+  cout << "Enter your password: ";
+  cin >> password;
+
+  // Auth_system running its checks.
+  bool success = auth.register_user(username, password);
+
+  if (!success)
+  {
+    cout << "Please try creating an account again." << endl;
+    return; // Bouncer pattern! Stop here if registration failed.
+  }
+
+  string secure_password_hash = auth.hash_password(password);
 
   // Instantiating customer object
-  Customer n_customer(user_first_name, user_last_name, user_email);
+  Customer n_customer(username, secure_password_hash);
 
   // Prompting for initial deposit
   float ini_depo{};
@@ -103,8 +109,7 @@ void account_creation(vector<Customer> &database)
 
   // Displaying success message
   divider();
-  cout << "Account created successfully."<< endl;
-  n_customer.display_accounts();  
+  cout << "Account created successfully." << endl;
+  n_customer.display_account_details();
   divider();
-
 }

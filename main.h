@@ -92,14 +92,11 @@ class Customer
 {
 private:
   string username;
-  string password_harsh;
-  string first_name;
-  string last_name;
-  string email;
+  string password_hash;
   vector<Account> accounts; // The Link! A customer "has" accounts.
 
 public:
-  Customer(string f_n, string l_n, string em, string u_name, string p_harsh) : first_name(f_n), last_name(l_n), email(em), username(u_name), password_harsh(p_harsh) {}
+  Customer(string u_name, string p_hash) : username(u_name), password_hash(p_hash) {}
 
   // Getters
   string get_username() { return username; }
@@ -120,9 +117,9 @@ public:
   }
 #endif
 
-  void display_accounts()
+  void display_account_details()
   {
-    cout << "Account summary for " << first_name << " " << last_name << ": " << endl;
+    cout << "Account summary for " << username << ": " << endl;
 
     if (accounts.empty())
     {
@@ -143,13 +140,6 @@ class AuthManager
 {
 private:
   string data_file;
-
-  string hash_password(string password)
-  {
-    hash<string> hasher;
-    size_t hashValue = hasher(password);
-    return to_string(hashValue);
-  }
 
   // Basic validation: username must be at least 3 characters and have no spaces.
   bool is_valid_username(string username)
@@ -200,10 +190,15 @@ private:
 public:
   AuthManager(string f_name) : data_file(f_name) {}
 
-  void register_user(string username, string password); // defined in main.cpp
+  bool register_user(string username, string password); // defined in main.cpp
+  void login_user(string username, string password);    // defined in main.cpp
 
-  void login_user(string username, string password); //defined in main.cpp
-
+  string hash_password(string password)
+  {
+    hash<string> hasher;
+    size_t hashValue = hasher(password);
+    return to_string(hashValue);
+  }
 };
 
 #endif

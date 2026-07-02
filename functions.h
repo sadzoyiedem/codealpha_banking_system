@@ -13,6 +13,6 @@ bool input_validation(int min, int max, int &user_opt);
 bool validate_trans_amount(float amount);
 
 // Program Functionalities
-void account_creation(vector<Customer> &database);
+void account_creation(vector<Customer> &database, AuthManager &auth);
 
 #endif

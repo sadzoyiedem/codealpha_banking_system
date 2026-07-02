@@ -1,16 +1,29 @@
 /*
+
   * Command Line Banking System
+
     * This banking system models real-word customer and account creation alongside transactions performed by customers.
+
     * Creates classes for Customer, Account and Transaction.
+
     * Uses modular function to handle account creation and managing of customers and accounts.
+
     * Implements features for deposit, withdrawals, and fund transfers.
+
     * Stores transaction history and allow users to view recent transactions.
+
     * Displays the neccesary account informations.
+
+
+
 
 
   * Developed by: Adzoyi Stephen Edem
 
+
+
   * June, 2026
+
 */
 
 #include <iomanip>
@@ -20,20 +33,26 @@
 int main()
 {
   // Welcome message
+
   divider();
+
   cout << setw(65)
        << "Welcome to Version 1 of the Edem's Banking System Application" << endl;
+
   divider();
 
   // Data structure holding list of customers
   vector<Customer> bank_database;
 
+  // Instantiate AuthManager and tell it the file_name
+  AuthManager auth_system("customer_data.txt");
+
   bool running = false;
+
   do
   {
     int user_option{};
     welcome_menu();
-
     cout << "Enter option: ";
     while (input_validation(1, 3, user_option))
       ;
@@ -41,7 +60,7 @@ int main()
     switch (user_option)
     {
     case 1:
-      account_creation(bank_database);
+      account_creation(bank_database, auth_system);
 #if DEBUG
       bank_database[0].display_details(); // This will now show "Accounts Owned: 1"
 #endif
@@ -49,10 +68,12 @@ int main()
     case 2:
       break;
     default:
+
       divider();
       cout << "Thank you for using this program. \n\nExiting program..." << endl;
       divider();
-      running = false;
+
+      running = true;
       break;
     }
 
@@ -72,6 +93,7 @@ void Account::withdraw(float amount)
   }
 
   balance -= amount;
+
   cout << "Withdrawal successful." << endl;
 }
 
@@ -94,36 +116,39 @@ void Account::display_transactions()
 
   divider();
 }
-void AuthManager::register_user(string username, string password)
+
+bool AuthManager::register_user(string username, string password)
 {
   if (!is_valid_username(username))
-    return;
-
+    return false;
   if (!is_valid_password(password))
-    return;
+    return false;
 
   if (username_exists(username))
   {
     cout << "Registration failed: username '" << username << "' is already taken.\n";
-    return;
+    return false;
   }
 
   string hashed_password = hash_password(password);
 
   ofstream file(data_file, ios::app);
+
   if (!file)
   {
     cout << "Registration failed: could not open the data file.\n";
-    return;
+    return false;
   }
 
   file << username << " " << hashed_password << endl;
-  cout << "Registration successful! You can now log in as '" << username << "'.\n";
+
+  return true;
 }
 
 void AuthManager::login_user(string username, string password)
 {
   ifstream file(data_file);
+
   if (!file)
   {
     cout << "Login failed: no users have registered yet.\n";
@@ -131,6 +156,7 @@ void AuthManager::login_user(string username, string password)
   }
 
   string file_username, file_hash;
+
   string entered_hash = hash_password(password);
 
   while (file >> file_username >> file_hash)
@@ -141,10 +167,9 @@ void AuthManager::login_user(string username, string password)
         cout << "Login successful! Welcome back, " << username << ".\n";
       else
         cout << "Login failed: incorrect password.\n";
-
       return;
     }
   }
-  
+
   cout << "Login failed: username '" << username << "' not found.\n";
 }
