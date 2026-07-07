@@ -1,4 +1,4 @@
-# Edem's Banking System (Version 1.0)
+# CodeAlpha Banking System (Version 1.0)
 
 ## Overview
 A command-line interface (CLI) banking application written in C++. This system models real-world banking operations, allowing users to register, log in, create accounts, and perform essential financial transactions. It utilizes a modular, object-oriented architecture to securely manage user authentication, account balances, and transaction histories.
