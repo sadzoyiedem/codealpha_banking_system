@@ -37,4 +37,11 @@ g++ main.cpp function.cpp -o bank_system
 ./bank_system
 ```
 ## Usage Flow
-1. 
+1. **Launch the app:** You will be geeted with the Main Menu. 
+2. **Create an Account (Option 1):** Register a username (no spaces, >2 chars) and a password (>5 chars). Follow the prompt to make an initial deposit.
+3. **Login (Option 2):** If you already have an account, log in using your credentials to access the Account Dashboard.
+4. **Dashboard:** From here, you can deposit, withdraw, transfer, or view your transaction history.
+5. **Logout:** Safely closes your active session and returns to the main menu.
+
+## Author
+Developed by: **Adzoyi Stephen Edem**      *June, 2026*
