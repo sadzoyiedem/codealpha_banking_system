@@ -1,39 +1,9 @@
-/*
-
-  * Command Line Banking System
-
-    * This banking system models real-word customer and account creation alongside transactions performed by customers.
-
-    * Creates classes for Customer, Account and Transaction.
-
-    * Uses modular function to handle account creation and managing of customers and accounts.
-
-    * Implements features for deposit, withdrawals, and fund transfers.
-
-    * Stores transaction history and allow users to view recent transactions.
-
-    * Displays the neccesary account informations.
-
-
-
-
-
-  * Developed by: Adzoyi Stephen Edem
-
-
-
-  * June, 2026
-
-*/
-
 #include <iomanip>
 #include "main.h"
 #include "functions.h"
 
 int main()
 {
-  // Welcome message
-
   divider();
 
   cout << setw(65)
@@ -41,13 +11,10 @@ int main()
 
   divider();
 
-  // Data structure holding list of customers
   vector<Customer> bank_database;
-
-  // Instantiate AuthManager and tell it the file_name
   AuthManager auth_system("customer_data.txt");
 
-  bool running = false;
+  bool running = true;
 
   do
   {
@@ -60,20 +27,67 @@ int main()
     switch (user_option)
     {
     case 1:
-      account_creation(bank_database, auth_system);
-#if DEBUG
-      bank_database[0].display_details(); // This will now show "Accounts Owned: 1"
-#endif
+    {
+      string active_user = account_creation(bank_database, auth_system);
+      if (!active_user.empty())
+      {
+        for (auto &cust : bank_database)
+        {
+          if (cust.get_username() == active_user)
+          {
+            dashboard_loop(cust, bank_database); // Go to Account Dashboard Loop
+            break;
+          }
+        }
+      }
       break;
+    }
     case 2:
-      break;
-    default:
+    {
+      string active_user = user_logging(bank_database, auth_system);
 
+      if (!active_user.empty())
+      {
+        bool found_in_memory = false;
+
+        // Try to find them in active memory (works if they created the account in this same session)
+        for (auto &cust : bank_database)
+        {
+          if (cust.get_username() == active_user)
+          {
+            found_in_memory = true;
+            dashboard_loop(cust, bank_database);
+            break;
+          }
+        }
+
+        //  Reconstruct the user if they restarted the app
+        if (!found_in_memory)
+        {
+          cout << "\n[System] Reloading user profile into active memory..." << endl;
+
+          // Recreate the customer object
+          Customer reloaded_cust(active_user, "loaded_from_file");
+
+          // The dashboard assumes the user has at least one account,
+          // so we must generate an empty one to prevent a crash.
+          Account empty_account(0.0f);
+          reloaded_cust.add_account(empty_account);
+
+          // Add them to the active session database
+          bank_database.push_back(reloaded_cust);
+
+          // Launch the dashboard using the newly added customer (the last one in the vector)
+          dashboard_loop(bank_database.back(), bank_database);
+        }
+      }
+      break;
+    }
+    default:
       divider();
       cout << "Thank you for using this program. \n\nExiting program..." << endl;
       divider();
-
-      running = true;
+      running = false;
       break;
     }
 
@@ -83,16 +97,19 @@ int main()
 }
 
 // Functions definitions from main.h
-
 void Account::withdraw(float amount)
 {
   if (amount > balance)
   {
-    cout << "Insufficient account balance to perform transaction!\nTop up acccount balance." << endl;
+    cout << "Insufficient account balance to perform transaction!\nTop up account balance." << endl;
     return;
   }
 
   balance -= amount;
+
+  // Creates transaction record for withdrawal
+  Transaction t("2026-07-06", -amount);
+  add_transaction(t);
 
   cout << "Withdrawal successful." << endl;
 }
@@ -110,8 +127,9 @@ void Account::display_transactions()
   for (int i = 0; i < transactions.size(); i++)
   {
     cout << "Transaction " << i + 1
-         << "Transaction id: " << transactions[i].get_trans_id()
-         << "Amount: " << transactions[i].get_amount() << endl;
+         << " | Date: " << transactions[i].get_date()
+         << " | ID: " << transactions[i].get_trans_id()
+         << " | Amount: GHC " << transactions[i].get_amount() << endl;
   }
 
   divider();
@@ -131,7 +149,6 @@ bool AuthManager::register_user(string username, string password)
   }
 
   string hashed_password = hash_password(password);
-
   ofstream file(data_file, ios::app);
 
   if (!file)
@@ -145,18 +162,17 @@ bool AuthManager::register_user(string username, string password)
   return true;
 }
 
-void AuthManager::login_user(string username, string password)
+bool AuthManager::login_user(string username, string password)
 {
   ifstream file(data_file);
 
   if (!file)
   {
     cout << "Login failed: no users have registered yet.\n";
-    return;
+    return false;
   }
 
   string file_username, file_hash;
-
   string entered_hash = hash_password(password);
 
   while (file >> file_username >> file_hash)
@@ -164,12 +180,18 @@ void AuthManager::login_user(string username, string password)
     if (file_username == username)
     {
       if (file_hash == entered_hash)
+      {
         cout << "Login successful! Welcome back, " << username << ".\n";
+        return true;
+      }
       else
+      {
         cout << "Login failed: incorrect password.\n";
-      return;
+        return false;
+      }
     }
   }
 
   cout << "Login failed: username '" << username << "' not found.\n";
+  return false;
 }

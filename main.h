@@ -25,16 +25,9 @@ private:
 
   static string generate_trans_id()
   {
-    // 1. The Seed: Pulls true random data from hardware
     std::random_device rd;
-
-    // 2. The Engine: Does the heavy math to pick a number
     std::mt19937 engine(rd());
-
-    // 3. The Distribution: Forces the number to be between 1000 and 9999
     std::uniform_int_distribution<int> dist(1000, 9999);
-
-    // Generate the number, turn it into a string, and add "TXN-"
     return "TXN-" + std::to_string(dist(engine));
   }
 
@@ -44,25 +37,22 @@ public:
   // getters
   string get_trans_id() { return transaction_id; }
   float get_amount() { return amount; }
+  string get_date() { return date; }
 };
+
 class Account
 {
-
 private:
   string account_number;
   float balance;
-  vector<Transaction> transactions; // store transactions data
+  vector<Transaction> transactions;
 
   static string generate_account_number()
   {
     random_device rd;
-
     mt19937_64 engine(rd());
-
     uniform_int_distribution<long long> rules(1000000000LL, 9999999999LL);
-
     long long raw_number = rules(engine);
-
     return to_string(raw_number);
   }
 
@@ -76,46 +66,34 @@ public:
   void deposit(float amount)
   {
     balance += amount;
+    Transaction t("2026-07-06", amount);
+    add_transaction(t);
     cout << "Amount deposit successful." << endl;
   }
 
-  void withdraw(float amount); // defined in main.cpp
-
-  // recording transactions of acccount
+  void withdraw(float amount);
   void add_transaction(Transaction &new_trans) { transactions.push_back(new_trans); }
-
-  void display_transactions(); // defined in main.cpp
+  void display_transactions();
 };
 
-// 2. Update Customer class to "own" Accounts
 class Customer
 {
 private:
   string username;
   string password_hash;
-  vector<Account> accounts; // The Link! A customer "has" accounts.
+  vector<Account> accounts;
 
 public:
   Customer(string u_name, string p_hash) : username(u_name), password_hash(p_hash) {}
 
   // Getters
   string get_username() { return username; }
+  vector<Account> &get_accounts() { return accounts; }
 
-  // Function to attach an account to this customer
   void add_account(Account &new_account)
   {
     accounts.push_back(new_account);
   }
-
-#if DEBUG
-  void display_details()
-  {
-    cout << "FN: " << first_name
-         << "\tLN: " << last_name
-         << "\tEM: " << email
-         << "\tAccounts Owned: " << accounts.size() << endl;
-  }
-#endif
 
   void display_account_details()
   {
@@ -141,7 +119,6 @@ class AuthManager
 private:
   string data_file;
 
-  // Basic validation: username must be at least 3 characters and have no spaces.
   bool is_valid_username(string username)
   {
     if (username.length() < 3)
@@ -160,7 +137,6 @@ private:
     return true;
   }
 
-  // Basic validation: password must be at least 6 characters.
   bool is_valid_password(string password)
   {
     if (password.length() < 6)
@@ -171,7 +147,6 @@ private:
     return true;
   }
 
-  // Reads through the data file to see if a username already exists.
   bool username_exists(string username)
   {
     ifstream file(data_file);
@@ -190,8 +165,8 @@ private:
 public:
   AuthManager(string f_name) : data_file(f_name) {}
 
-  bool register_user(string username, string password); // defined in main.cpp
-  void login_user(string username, string password);    // defined in main.cpp
+  bool register_user(string username, string password);
+  bool login_user(string username, string password);
 
   string hash_password(string password)
   {
