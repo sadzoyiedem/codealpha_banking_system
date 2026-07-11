@@ -44,4 +44,4 @@ g++ main.cpp function.cpp -o bank_system
 5. **Logout:** Safely closes your active session and returns to the main menu.
 
 ## Author
-Developed by: **Adzoyi Stephen Edem**  *June, 2026*
+Developed by: **Adzoyi Stephen Edem** //  *June, 2026*
