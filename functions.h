@@ -2,16 +2,11 @@
 #define FUNCTIONS_H
 
 #include <string>
-#include <vector>
 #include "main.h"
 
 using namespace std;
 
 // Helper functions
-void welcome_menu();
-void divider();
-void clear_screen();
-bool input_validation(int min, int max, int &user_opt);
 bool validate_trans_amount(float amount);
 void account_menu();
 
